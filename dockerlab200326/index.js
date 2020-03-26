@@ -1,38 +1,30 @@
 const express = require('express');
-
 const redis = require('redis');
-
 const app = express();
-
-const process = require('process');
 
 const client = redis.createClient({
     host: 'redis-server',
     port: 6379
 });;
 
-app.get('/:numberOne/:numberTwo', (req, resp) => {
+app.get('/:param1/:param2', async(req, resp) => {
 
-    const score = req.params.numberOne;
-    process.exit(0);
+    const param1 = req.params.param1;
+    const param2 = req.params.param2;
+    const redisKey = `${param1}:${param2}`;
    
-    client.get('score', (err, counter) => {
-        if(score == null){
-            while(numberOne != numberTwo){
-                if(numberOne > numberTwo)
-                numberOne = numberOne - numberTwo;
-                else 
-                numberTwo = numberTwo - numberOne;
-            } 
-            client.send(numberOne);
-        }
-        client.set('numberOne', parseInt(numberOne));
-    });
+    client.get(redisKey, (err, redisVal) => {
+        if(redisVal == null) redisVal = NWD(param1, param2);
 
-        
-
+        resp.send(`NWD: ${redisVal}`)
+        client.set(redisKey, parseInt(redisVal));
+    });   
 });
 
-app.listen(8081, () => {
-    console.log('Server listening on port 8001');
+app.listen(3100, () => {
+    console.log('Server from base app is in 3100');
 });
+
+function NWD(n, g){
+    return g == 0 ? n : NWD(g, n%g);
+}
